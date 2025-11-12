@@ -3,7 +3,6 @@
 功能：
     1、通过Drissionpage实现20240101-至今相关的电力交易相关文本内容自动化数据收集
     2、开发每日数据更新的函数进行对当日时间电力交易相关文本内容自动化数据收集
-    3、对收集到的数据进行ETL处理，转换成sqlite存储
 """
 
 from DrissionPage import ChromiumPage
