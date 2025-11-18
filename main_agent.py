@@ -2,16 +2,8 @@
 电力交易智能问答系统核心
 """
 from data2sqlite import _sqlite
-from openai import OpenAI
 import sqlite3
-
-agent_config={
-    'api_key':'sk-iuhzfmlhdkoohzupkbuvrisosbmibokygjfdvugjxszuwrrd',
-    'base_url':"https://api.siliconflow.cn/v1",
-    'lang_module':'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
-    'rerank_module':'Qwen/Qwen3-Reranker-8B'
-}
-
+from module_api import reranked_text,chat_agent
 
 def get_data():
     _sqlite()
@@ -35,14 +27,19 @@ def search_relax_text(query:str):
     if title_text:
         titles=title_text.keys()
         print(titles)
+        reranked_texts=reranked_text(query,titles)
+        return reranked_texts if reranked_texts else None
     else:
         return None
 
-def rerank(query:str,chunk_list:list):
-    title_text=get_data()
-
-def main():
-    search_relax_text(query='11')
+def main(query:str):
+    try:
+        reranked_texts=search_relax_text(query='11')
+        response=chat_agent(query,reranked_texts)
+        for chunk in response:
+            yield chunk
+    except Exception as e:
+        yield f'电力交易智能问答系统发生错误:{e}'
 
 if __name__ == '__main__':
     main()
