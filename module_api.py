@@ -1,5 +1,5 @@
 """
-模型调用模块
+模型调用模块，支持流式输出
 """
 import traceback
 from openai import OpenAI
@@ -75,13 +75,61 @@ def rerank_documents(query: str, documents: List[str], top_k: int = 3) -> List[D
         print(f'详细信息:{traceback.format_exc()}')
         return []
 
+def chat_agent(query: str, documents: List[str]):
+    """
+    基于deepseek的大语言模型智能问答
+    :param query: 问题
+    :param documents: 参考新闻文本列表
+    :return:
+    """
+    try:
+        # 初始化客户端
+        client = OpenAI(
+            api_key=agent_config["api_key"],
+            base_url=agent_config["base_url"],
+        )
 
+        # 构建系统提示词
+        system_prompt = """你是一个专业的电力交易问答专家。请根据以下参考文本内容以及自己的专业知识回答问题"""
+
+        # 构建用户消息
+        user_content = f"""
+    问题：{query}
+    参考文本内容：
+    {chr(10).join([f'{i + 1}. {doc}' for i, doc in enumerate(documents)])}
+    """
+
+        # 构建消息列表
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content}
+        ]
+
+        # 调用API，开启流式输出
+        response = client.chat.completions.create(
+            model=agent_config['lang_module'],
+            messages=messages,
+            stream=True  # 启用流式输出
+        )
+
+        # 处理流式响应
+        for chunk in response:
+            if chunk.choices and chunk.choices[0].delta.content is not None:
+                content = chunk.choices[0].delta.content
+                yield content
+
+    except Exception as e:
+        yield f"错误：{str(e)}"
 
 if __name__ == "__main__":
     documents=['宁夏2025年迎峰度冬有序用电（负荷管理）实施方案：有序用电方案规模应不低于本地区历史最高负荷的30%', '报价低于成本价！2026年电力零售市场“卷价格”的风险与应对', '广西新能源市场化电量达526.88亿千瓦时', '全国统一电力市场初步建成 97万家市场经营主体在全球最大“电力卖场”交易', '广西电力市场是真蓝海还是新内卷？关键要点解析', '国网能源院专家：以规则制度赋能全国统一电力市场建设', '河南电力现货市场近期试运行分析']
-    query='广西电力市场'
+    query='广西电力市场应该怎么调整'
     reranked_text=rerank_documents(query, documents)
-    print(reranked_text)
+    texts=[text['document'] for text in reranked_text]
+    print(texts)
+    response=chat_agent(query, texts)
+    for chunk in response:
+        print(chunk,end='',flush=True)
 
 
 
