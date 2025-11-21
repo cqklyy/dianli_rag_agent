@@ -3,7 +3,7 @@
 """
 from data2sqlite import _sqlite
 import sqlite3
-from module_api import reranked_text,chat_agent
+from module_api import rerank_documents,chat_agent
 
 def get_data():
     _sqlite()
@@ -24,22 +24,26 @@ def get_data():
 
 def search_relax_text(query:str):
     title_text=get_data()
+    print(f'获取到的知识文本:\n{title_text}')
+
     if title_text:
         titles=title_text.keys()
         print(titles)
-        reranked_texts=reranked_text(query,titles)
+        reranked_texts=rerank_documents(query,list(titles),top_k=3)
         return reranked_texts if reranked_texts else None
     else:
         return None
 
 def main(query:str):
     try:
-        reranked_texts=search_relax_text(query='11')
-        response=chat_agent(query,reranked_texts)
-        for chunk in response:
-            yield chunk
+        reranked_texts=search_relax_text(query=query)
+        print(reranked_texts)
+    #     response=chat_agent(query,reranked_texts)
+    #     for chunk in response:
+    #         yield chunk
     except Exception as e:
         yield f'电力交易智能问答系统发生错误:{e}'
 
 if __name__ == '__main__':
-    main()
+    main(query='广西市场')
+    print(f'正在为您回答问题...')
