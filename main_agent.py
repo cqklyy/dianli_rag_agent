@@ -34,16 +34,20 @@ def search_relax_text(query:str):
     else:
         return None
 
-def main(query:str):
+def main_agent(query:str):
     try:
         reranked_texts=search_relax_text(query=query)
-        print(reranked_texts)
-    #     response=chat_agent(query,reranked_texts)
-    #     for chunk in response:
-    #         yield chunk
+        texts=[text['document'] for text in reranked_texts]
+        response=chat_agent(query,texts)
+        for chunk in response:
+            yield chunk
     except Exception as e:
         yield f'电力交易智能问答系统发生错误:{e}'
 
 if __name__ == '__main__':
-    main(query='广西市场')
     print(f'正在为您回答问题...')
+    # relaxed_text=search_relax_text(query='广西市场')
+    # print(relaxed_text)
+    response=main_agent(query='广西市场')
+    for chunk in response:
+        print(chunk,end='', flush=True)
