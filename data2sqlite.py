@@ -57,4 +57,5 @@ def _sqlite():
 
 if __name__ == "__main__":
     data2sqlite()
+    # _sqlite()
 

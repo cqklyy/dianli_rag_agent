@@ -30,20 +30,28 @@ def search_relax_text(query:str):
         titles=title_text.keys()
         print(titles)
         reranked_texts=rerank_documents(query,list(titles),top_k=3)
-        return reranked_texts if reranked_texts else None
+        print(reranked_texts)
+        text_list=[]
+        for i in reranked_texts:
+            title=i['document']
+            text=title_text[title]
+            text_list.append(text)
+        return text_list if text_list else None
     else:
         return None
 
 def main(query:str):
     try:
         reranked_texts=search_relax_text(query=query)
-        print(reranked_texts)
-    #     response=chat_agent(query,reranked_texts)
-    #     for chunk in response:
-    #         yield chunk
+        print(f'查询到的相关文本:\n{reranked_texts}')
+        response=chat_agent(query,reranked_texts)
+        for chunk in response:
+            yield chunk
     except Exception as e:
         yield f'电力交易智能问答系统发生错误:{e}'
 
 if __name__ == '__main__':
-    main(query='广西市场')
     print(f'正在为您回答问题...')
+    response=main(query='广西市场')
+    for chunk in response:
+        print(chunk,end='',flush=True)
