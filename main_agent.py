@@ -28,14 +28,16 @@ def search_relax_text(query:str):
 
     if title_text:
         titles=title_text.keys()
-        print(titles)
+        print(f'对应标题有:{titles}')
         reranked_texts=rerank_documents(query,list(titles),top_k=3)
-        print(reranked_texts)
+        print(f'获取到的相关标题:{reranked_texts}')
         text_list=[]
         for i in reranked_texts:
+            # print(i)
             title=i['document']
             text=title_text[title]
             text_list.append(text)
+            # print(f'最终相关文本:{text_list}')
         return text_list if text_list else None
     else:
         return None
@@ -43,7 +45,7 @@ def search_relax_text(query:str):
 def main(query:str):
     try:
         reranked_texts=search_relax_text(query=query)
-        print(f'查询到的相关文本:\n{reranked_texts}')
+        # print(f'查询到的相关文本:\n{reranked_texts}')
         response=chat_agent(query,reranked_texts)
         for chunk in response:
             yield chunk
@@ -52,6 +54,6 @@ def main(query:str):
 
 if __name__ == '__main__':
     print(f'正在为您回答问题...')
-    response=main(query='广西市场')
+    response=main(query='福建省电力中长期市场交易方案怎么样')
     for chunk in response:
         print(chunk,end='',flush=True)
