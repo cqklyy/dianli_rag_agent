@@ -90,7 +90,7 @@ class DataCollector:
                     except Exception as e:
                         logger.error(f'报道《{news_title}》数据采集出错:{e}')
                         print(f'详细信息:{traceback.format_exc()}')
-                        break
+                        # break
 
             else:
                 logger.error('未获取报道列表元素，请检查')

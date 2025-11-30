@@ -15,7 +15,7 @@ logger.setLevel(logging.INFO)
 def data2sqlite():
     data_collector = DataCollector()
     _sqlite()
-    original_data = data_collector.data_collect_since(pages=1)
+    original_data = data_collector.data_collect_since(pages=8)
     # 打印
     # for tite, text in original_data.items():
     #     print(f'标题:{tite}\n内容:\n{text}')

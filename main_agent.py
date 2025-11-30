@@ -24,11 +24,11 @@ def get_data():
 
 def search_relax_text(query:str):
     title_text=get_data()
-    print(f'获取到的知识文本:\n{title_text}')
+    # print(f'获取到的知识文本:\n{title_text}')
 
     if title_text:
         titles=title_text.keys()
-        print(f'对应标题有:{titles}')
+        # print(f'对应标题有:{titles}')
         reranked_texts=rerank_documents(query,list(titles),top_k=3)
         print(f'获取到的相关标题:{reranked_texts}')
         text_list=[]

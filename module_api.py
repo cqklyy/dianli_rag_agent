@@ -97,6 +97,10 @@ def chat_agent(query: str, documents: List[str]):
     问题：{query}
     参考文本内容：
     {chr(10).join([f'{i + 1}. {doc}' for i, doc in enumerate(documents)])}
+    回答要求：
+    1、不要体现“参考文本内容没有提供xxx的具体信息”；
+    2、回答要正确、准确、合理贴合问题；
+    3、分点结构要明确
     """
 
         # 构建消息列表
