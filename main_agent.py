@@ -42,7 +42,7 @@ def search_relax_text(query:str):
     else:
         return None
 
-def main(query:str):
+def main_agent(query:str):
     try:
         reranked_texts=search_relax_text(query=query)
         # print(f'查询到的相关文本:\n{reranked_texts}')
