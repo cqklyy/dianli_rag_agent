@@ -54,6 +54,6 @@ def main_agent(query:str):
 
 if __name__ == '__main__':
     print(f'正在为您回答问题...')
-    response=main(query='福建省电力中长期市场交易方案怎么样')
+    response=main_agent(query='福建省电力中长期市场交易方案怎么样')
     for chunk in response:
         print(chunk,end='',flush=True)

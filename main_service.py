@@ -30,6 +30,20 @@ CORS(
 # 全局配置
 app.config['JSON_AS_ASCII'] = False  # 支持中文JSON响应
 
+# 根路径处理
+@app.route('/', methods=['GET'])
+def index():
+    """根路径处理"""
+    return jsonify({
+        'message': '电力交易智能问答系统API服务',
+        'version': '1.0.0',
+        'endpoints': {
+            'health': '/health',
+            'chat': '/api/chat'
+        },
+        'timestamp': datetime.now().isoformat()
+    })
+
 # 健康检查接口
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -134,6 +148,7 @@ def internal_error(error):
 # 启动服务
 if __name__ == '__main__':
     logger.info("电力交易智能问答系统服务启动...")
+    logger.info("根路径: http://localhost:5000/")
     logger.info("健康检查接口: http://localhost:5000/health")
     logger.info("问答接口: http://localhost:5000/api/chat")
     
