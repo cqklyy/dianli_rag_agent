@@ -23,7 +23,7 @@ CORS(
     app,
     methods=['GET','POST','PUT'],
     allow_headers=['Content-Type', 'Authorization'],
-    origins=['http://localhost:3000', 'http://127.0.0.1:3000'],
+    origins='*',
     supports_credentials=True
 )
 
