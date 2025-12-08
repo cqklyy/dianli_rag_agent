@@ -37,12 +37,7 @@
           登录
         </el-button>
       </el-form>
-      
-      <div class="demo-accounts">
-        <h3>演示账户：</h3>
-        <p>管理员：cqk / 123456</p>
-        <p>普通用户：lyy / 123456</p>
-      </div>
+
     </div>
   </div>
 </template>
