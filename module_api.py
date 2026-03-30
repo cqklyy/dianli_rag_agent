@@ -7,7 +7,7 @@ import requests
 from typing import List, Dict, Any
 
 agent_config={
-    'api_key':'sk-ikuwkmunggtqrigwxbzlmampmetjrzxdyrhvrfswowswhmsm',
+    'api_key':'sk-wkzwbjtzoxzblqqjlouhppdckcqbokiozplllfloqkxsctdj',
     'base_url':"https://api.siliconflow.cn/v1",
     'lang_module':'deepseek-ai/DeepSeek-R1-Distill-Qwen-32B',
     'rerank_module':'Qwen/Qwen3-Reranker-8B'
