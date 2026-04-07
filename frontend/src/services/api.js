@@ -82,4 +82,130 @@ export const chatAPI = {
   }
 }
 
+// 知识库管理相关API
+export const knowledgeBaseAPI = {
+  // 获取知识库数据
+  getData: (page = 1, pageSize = 10) => {
+    return new Promise((resolve, reject) => {
+      fetch(`/api/data/get?page=${page}&pageSize=${pageSize}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('获取数据失败')
+        }
+        return response.json()
+      })
+      .then(data => {
+        resolve(data)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 添加数据
+  addData: (data) => {
+    return new Promise((resolve, reject) => {
+      fetch('/api/data/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('添加数据失败')
+        }
+        return response.json()
+      })
+      .then(result => {
+        resolve(result)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 删除数据
+  deleteData: (id) => {
+    return new Promise((resolve, reject) => {
+      fetch(`/api/data/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('删除数据失败')
+        }
+        return response.json()
+      })
+      .then(result => {
+        resolve(result)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 更新数据
+  updateData: (id, data) => {
+    return new Promise((resolve, reject) => {
+      fetch(`/api/data/update/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('更新数据失败')
+        }
+        return response.json()
+      })
+      .then(result => {
+        resolve(result)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 自动数据采集
+  collectData: (response) => {
+    return new Promise((resolve, reject) => {
+      fetch('/api/data/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ response })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('数据采集失败')
+        }
+        return response.json()
+      })
+      .then(data => {
+        resolve(data)
+      })
+      .catch(error => {
+        reject(error)
+      })
+    })
+  }
+}
+
 export default api

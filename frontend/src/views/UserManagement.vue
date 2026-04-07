@@ -6,6 +6,7 @@
         <h2>用户管理</h2>
       </div>
       <div class="header-right">
+        <el-button type="primary" @click="goToKnowledgeBase">知识库管理</el-button>
         <el-button type="primary" @click="goToChat">返回问答</el-button>
         <el-button @click="handleLogout">退出登录</el-button>
       </div>
@@ -240,6 +241,11 @@ export default {
       router.push('/chat')
     }
 
+    // 跳转到知识库管理
+    const goToKnowledgeBase = () => {
+      router.push('/knowledge-base')
+    }
+
     // 退出登录
     const handleLogout = () => {
       authStore.logout()
@@ -268,6 +274,7 @@ export default {
       handleDelete,
       handleSubmit,
       goToChat,
+      goToKnowledgeBase,
       handleLogout
     }
   }

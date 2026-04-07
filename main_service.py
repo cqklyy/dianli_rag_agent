@@ -1,4 +1,5 @@
 from main_agent import main_agent
+from data2sqlite import data2sqlite
 from flask import Flask, jsonify,request
 from flask_cors import CORS
 import logging
@@ -257,6 +258,289 @@ def chat():
         logger.error(error_msg)
         return jsonify({'error': error_msg}), 500
 
+# 自动数据采集接口
+@app.route('/api/data/collect', methods=['POST'])
+def collect_data():
+    """
+    自动数据采集接口
+    
+    请求格式:
+    {
+        "response": "前端返回的响应"
+    }
+    
+    返回格式:
+    {
+        "status": "success",
+        "message": "数据采集完成",
+        "timestamp": "2024-01-01 00:00:00"
+    }
+    """
+    try:
+        # 获取JSON请求数据
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '请求体必须是JSON格式'}), 400
+        
+        # 提取参数
+        response = data.get('response', '')
+        
+        logger.info(f"收到数据采集请求，前端响应: {response}")
+        
+        # 执行数据采集
+        data2sqlite()
+        
+        result = {
+            'status': 'success',
+            'message': '数据采集完成',
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        logger.info("数据采集任务执行完成")
+        return jsonify(result)
+        
+    except Exception as e:
+        error_msg = f"数据采集接口错误: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': error_msg}), 500
+
+# 获取知识库数据接口
+@app.route('/api/data/get', methods=['GET'])
+def get_knowledge_base_data():
+    """
+    获取知识库数据接口
+    
+    查询参数:
+    - page: 页码，默认1
+    - pageSize: 每页数量，默认10
+    
+    返回格式:
+    {
+        "data": [
+            {
+                "id": 1,
+                "title": "标题",
+                "content": "内容",
+                "created_time": "2024-01-01 00:00:00"
+            }
+        ],
+        "total": 100
+    }
+    """
+    try:
+        import sqlite3
+        
+        # 获取分页参数
+        page = request.args.get('page', 1, type=int)
+        pageSize = request.args.get('pageSize', 10, type=int)
+        
+        conn = sqlite3.connect('data/电力交易.db')
+        conn.row_factory = sqlite3.Row  # 启用字典类型的行
+        cursor = conn.cursor()
+        
+        # 查询总记录数
+        cursor.execute('SELECT COUNT(*) FROM 电力交易数据')
+        total = cursor.fetchone()[0]
+        
+        # 计算偏移量
+        offset = (page - 1) * pageSize
+        
+        # 查询分页数据
+        cursor.execute('SELECT id, title, content, created_time FROM 电力交易数据 ORDER BY created_time DESC LIMIT ? OFFSET ?', (pageSize, offset))
+        rows = cursor.fetchall()
+        
+        # 转换为字典列表
+        data = []
+        for row in rows:
+            data.append({
+                'id': row['id'],
+                'title': row['title'],
+                'content': row['content'],
+                'created_time': row['created_time']
+            })
+        
+        conn.close()
+        
+        # 返回分页数据
+        result = {
+            'data': data,
+            'total': total
+        }
+        
+        logger.info(f"获取知识库数据成功，第 {page} 页，每页 {pageSize} 条，共 {total} 条")
+        return jsonify(result)
+        
+    except Exception as e:
+        error_msg = f"获取知识库数据错误: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': error_msg}), 500
+
+# 添加知识库数据接口
+@app.route('/api/data/add', methods=['POST'])
+def add_knowledge_base_data():
+    """
+    添加知识库数据接口
+    
+    请求格式:
+    {
+        "title": "标题",
+        "content": "内容"
+    }
+    
+    返回格式:
+    {
+        "success": true,
+        "data": {
+            "id": 1,
+            "title": "标题",
+            "content": "内容"
+        }
+    }
+    """
+    try:
+        import sqlite3
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '请求体必须是JSON格式'}), 400
+        
+        title = data.get('title', '').strip()
+        content = data.get('content', '').strip()
+        
+        if not title:
+            return jsonify({'error': '标题不能为空'}), 400
+        
+        conn = sqlite3.connect('data/电力交易.db')
+        cursor = conn.cursor()
+        
+        # 插入数据
+        cursor.execute(
+            'INSERT OR IGNORE INTO 电力交易数据 (title, content) VALUES (?, ?)',
+            (title, content)
+        )
+        
+        # 获取插入的ID
+        new_id = cursor.lastrowid
+        
+        conn.commit()
+        conn.close()
+        
+        result = {
+            'success': True,
+            'data': {
+                'id': new_id,
+                'title': title,
+                'content': content
+            }
+        }
+        
+        logger.info(f"添加知识库数据成功，ID: {new_id}, 标题: {title}")
+        return jsonify(result)
+        
+    except Exception as e:
+        error_msg = f"添加知识库数据错误: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': error_msg}), 500
+
+# 删除知识库数据接口
+@app.route('/api/data/delete/<int:id>', methods=['DELETE'])
+def delete_knowledge_base_data(id):
+    """
+    删除知识库数据接口
+    
+    返回格式:
+    {
+        "success": true
+    }
+    """
+    try:
+        import sqlite3
+        
+        conn = sqlite3.connect('data/电力交易.db')
+        cursor = conn.cursor()
+        
+        # 删除数据
+        cursor.execute('DELETE FROM 电力交易数据 WHERE id = ?', (id,))
+        
+        conn.commit()
+        conn.close()
+        
+        result = {
+            'success': True
+        }
+        
+        logger.info(f"删除知识库数据成功，ID: {id}")
+        return jsonify(result)
+        
+    except Exception as e:
+        error_msg = f"删除知识库数据错误: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': error_msg}), 500
+
+# 更新知识库数据接口
+@app.route('/api/data/update/<int:id>', methods=['PUT'])
+def update_knowledge_base_data(id):
+    """
+    更新知识库数据接口
+    
+    请求格式:
+    {
+        "title": "标题",
+        "content": "内容"
+    }
+    
+    返回格式:
+    {
+        "success": true,
+        "data": {
+            "id": 1,
+            "title": "标题",
+            "content": "内容"
+        }
+    }
+    """
+    try:
+        import sqlite3
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': '请求体必须是JSON格式'}), 400
+        
+        title = data.get('title', '').strip()
+        content = data.get('content', '').strip()
+        
+        if not title:
+            return jsonify({'error': '标题不能为空'}), 400
+        
+        conn = sqlite3.connect('data/电力交易.db')
+        cursor = conn.cursor()
+        
+        # 更新数据
+        cursor.execute(
+            'UPDATE 电力交易数据 SET title = ?, content = ? WHERE id = ?',
+            (title, content, id)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        result = {
+            'success': True,
+            'data': {
+                'id': id,
+                'title': title,
+                'content': content
+            }
+        }
+        
+        logger.info(f"更新知识库数据成功，ID: {id}, 标题: {title}")
+        return jsonify(result)
+        
+    except Exception as e:
+        error_msg = f"更新知识库数据错误: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({'error': error_msg}), 500
+
 # 错误处理
 @app.errorhandler(404)
 def not_found(error):
@@ -277,6 +561,7 @@ if __name__ == '__main__':
     logger.info("健康检查接口: http://localhost:5000/health")
     logger.info("问答接口: http://localhost:5000/api/chat")
     logger.info("SSE问答接口: http://localhost:5000/api/chat/sse")
+    logger.info("自动数据采集接口: http://localhost:5000/api/data/collect")
     
     # 生产环境建议设置debug=False
     app.run(host='0.0.0.0', port=5000, debug=True)

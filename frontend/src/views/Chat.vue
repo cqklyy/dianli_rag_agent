@@ -10,6 +10,9 @@
         <el-button v-if="user.role === 'admin'" type="primary" @click="goToUserManagement">
           用户管理
         </el-button>
+        <el-button v-if="user.role === 'admin'" type="primary" @click="goToKnowledgeBase">
+          知识库管理
+        </el-button>
         <el-button @click="handleLogout">退出登录</el-button>
       </div>
     </el-header>
@@ -200,6 +203,11 @@ export default {
       router.push('/users')
     }
 
+    // 跳转到知识库管理
+    const goToKnowledgeBase = () => {
+      router.push('/knowledge-base')
+    }
+
     // 退出登录
     const handleLogout = () => {
       authStore.logout()
@@ -225,6 +233,7 @@ export default {
       handleSend,
       clearChat,
       goToUserManagement,
+      goToKnowledgeBase,
       handleLogout
     }
   }

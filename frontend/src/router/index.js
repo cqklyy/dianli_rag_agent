@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Chat from '../views/Chat.vue'
 import UserManagement from '../views/UserManagement.vue'
+import KnowledgeBaseManagement from '../views/KnowledgeBaseManagement.vue'
 
 const routes = [
   {
@@ -23,6 +24,12 @@ const routes = [
     path: '/users',
     name: 'UserManagement',
     component: UserManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/knowledge-base',
+    name: 'KnowledgeBaseManagement',
+    component: KnowledgeBaseManagement,
     meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
